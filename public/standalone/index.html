@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Deadline Companion</title>
+  <meta name="description" content="A complete college assignment and deadline tracker to solve coursework fragmentation across WhatsApp, Google Classroom, and LMS platforms." />
+  <meta property="og:title" content="Student Deadline Companion" />
+  <meta property="og:description" content="A complete college assignment and deadline tracker to solve coursework fragmentation across WhatsApp, Google Classroom, and LMS platforms." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts: Plus Jakarta Sans for crisp academic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Vanilla CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- App Header & Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">🎓</div>
+        <div>
+          <h1 class="brand-title">Student Deadline Companion</h1>
+          <p class="brand-subtitle">Unified Assignment Tracker for College Students</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="open-guide-btn" class="btn btn-guide" title="View College Project Presentation & Design Thinking Guide">
+          <span>🎓</span>
+          <span>Viva & Review Guide</span>
+        </button>
+
+        <button id="load-demo-btn" class="btn btn-secondary" title="Load sample university coursework">
+          <span>📦</span>
+          <span>Load Demo Data</span>
+        </button>
+
+        <button id="open-modal-btn" class="btn btn-primary">
+          <span class="btn-icon">+</span>
+          <span>Add Assignment</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Problem Statement & College Review Ribbon -->
+  <aside class="college-banner">
+    <div class="banner-container">
+      <div class="banner-left">
+        <span class="banner-badge">Problem Solved</span>
+        <span>Consolidating scattered deadlines from <strong>WhatsApp groups</strong>, <strong>Classroom announcements</strong>, and <strong>LMS portals</strong> into one prioritized dashboard.</span>
+      </div>
+      <div class="banner-links">
+        <button id="banner-guide-btn" class="banner-link-btn">Design Thinking Process (5 Steps)</button>
+        <span>•</span>
+        <button id="export-json-btn" class="banner-link-btn">Export Backup</button>
+        <span>•</span>
+        <button id="import-json-btn" class="banner-link-btn">Import Backup</button>
+        <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- 5 Top Metric Cards -->
+    <section class="stats-grid" aria-label="Coursework Deadlines Overview">
+      <div class="stat-card all active" id="stat-all" data-tab="all" title="Click to view all assignments">
+        <div class="stat-header">
+          <span class="stat-label">Total Work</span>
+          <span class="stat-icon">📚</span>
+        </div>
+        <div class="stat-number" id="count-all">0</div>
+        <p class="stat-desc">All registered assignments</p>
+      </div>
+
+      <div class="stat-card today" id="stat-today" data-tab="today" title="Click to view assignments due today">
+        <div class="stat-header">
+          <span class="stat-label">Due Today</span>
+          <span class="stat-icon">⏰</span>
+        </div>
+        <div class="stat-number" id="count-today">0</div>
+        <p class="stat-desc">Due before midnight</p>
+      </div>
+
+      <div class="stat-card this-week" id="stat-this-week" data-tab="this-week" title="Click to view assignments due in next 7 days">
+        <div class="stat-header">
+          <span class="stat-label">This Week</span>
+          <span class="stat-icon">🗓️</span>
+        </div>
+        <div class="stat-number" id="count-this-week">0</div>
+        <p class="stat-desc">Next 7 days lookahead</p>
+      </div>
+
+      <div class="stat-card overdue" id="stat-overdue" data-tab="overdue" title="Click to view overdue assignments">
+        <div class="stat-header">
+          <span class="stat-label">Overdue</span>
+          <span class="stat-icon">⚠️</span>
+        </div>
+        <div class="stat-number" id="count-overdue">0</div>
+        <p class="stat-desc">Urgent submissions</p>
+      </div>
+
+      <div class="stat-card completed" id="stat-completed" data-tab="completed" title="Click to view finished assignments">
+        <div class="stat-header">
+          <span class="stat-label">Completed</span>
+          <span class="stat-icon">✅</span>
+        </div>
+        <div class="stat-number" id="count-completed">0</div>
+        <p class="stat-desc">Finished coursework</p>
+      </div>
+    </section>
+
+    <!-- Coursework Completion Progress Bar -->
+    <section class="progress-container" aria-label="Coursework Completion Rate">
+      <div class="progress-info">
+        <span>Semester Progress:</span>
+        <span id="progress-fraction">0 of 0 completed</span>
+      </div>
+      <div class="progress-track">
+        <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+      </div>
+      <div id="progress-percentage" class="progress-percentage">0%</div>
+    </section>
+
+    <!-- Toolbar: Tabs, Search, Priority, Subject, Source & Sort -->
+    <section class="toolbar-section">
+      <!-- Status Tabs -->
+      <nav class="tabs-nav" aria-label="Assignment Status Navigation">
+        <button class="tab-btn active" data-tab="all">
+          <span>All</span>
+          <span class="tab-badge" id="tab-count-all">0</span>
+        </button>
+        <button class="tab-btn" data-tab="today">
+          <span>Today</span>
+          <span class="tab-badge" id="tab-count-today">0</span>
+        </button>
+        <button class="tab-btn" data-tab="this-week">
+          <span>This Week</span>
+          <span class="tab-badge" id="tab-count-this-week">0</span>
+        </button>
+        <button class="tab-btn" data-tab="upcoming">
+          <span>Upcoming</span>
+          <span class="tab-badge" id="tab-count-upcoming">0</span>
+        </button>
+        <button class="tab-btn" data-tab="overdue">
+          <span>Overdue</span>
+          <span class="tab-badge" id="tab-count-overdue">0</span>
+        </button>
+        <button class="tab-btn" data-tab="completed">
+          <span>Completed</span>
+          <span class="tab-badge" id="tab-count-completed">0</span>
+        </button>
+      </nav>
+
+      <!-- Multi-Criteria Filters & Search -->
+      <div class="filter-controls">
+        <!-- Live Search -->
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search by title, subject, notes, or source..." />
+          <button id="clear-search-btn" class="clear-btn" style="display: none;" title="Clear search">✕</button>
+        </div>
+
+        <!-- Filter: Subject -->
+        <div class="select-wrapper">
+          <label for="filter-subject">Subject:</label>
+          <select id="filter-subject">
+            <option value="all">All Subjects</option>
+          </select>
+        </div>
+
+        <!-- Filter: Priority -->
+        <div class="select-wrapper">
+          <label for="filter-priority">Priority:</label>
+          <select id="filter-priority">
+            <option value="all">All Priorities</option>
+            <option value="High">🔴 High Priority</option>
+            <option value="Medium">🟠 Medium Priority</option>
+            <option value="Low">🟢 Low Priority</option>
+          </select>
+        </div>
+
+        <!-- Filter: Source Channel -->
+        <div class="select-wrapper">
+          <label for="filter-source">Source:</label>
+          <select id="filter-source">
+            <option value="all">All Sources</option>
+            <option value="WhatsApp">💬 WhatsApp</option>
+            <option value="Google Classroom">🏫 Google Classroom</option>
+            <option value="Moodle / LMS">💻 Moodle / LMS</option>
+            <option value="Classroom Announcement">📢 Announcement</option>
+            <option value="Notebook / Lecture">📓 Lecture Notes</option>
+          </select>
+        </div>
+
+        <!-- Sort -->
+        <div class="select-wrapper">
+          <label for="sort-by">Sort:</label>
+          <select id="sort-by">
+            <option value="date-asc">Due Date (Soonest)</option>
+            <option value="date-desc">Due Date (Latest)</option>
+            <option value="priority-desc">Priority (High to Low)</option>
+            <option value="subject">Subject (A-Z)</option>
+            <option value="title">Assignment Title (A-Z)</option>
+          </select>
+        </div>
+
+        <!-- Reset Button -->
+        <button id="reset-filters-btn" class="btn btn-secondary btn-sm" style="display: none;">
+          Clear Filters
+        </button>
+      </div>
+    </section>
+
+    <!-- View Title & Count -->
+    <div class="section-title-bar">
+      <h2 id="current-view-title">All Coursework Assignments</h2>
+      <span class="items-count" id="items-count-text">Showing 0 assignments</span>
+    </div>
+
+    <!-- Assignments List Container -->
+    <section id="assignments-container" class="assignments-container">
+      <!-- Cards and grouped sections will be rendered dynamically by script.js -->
+    </section>
+
+    <!-- Contextual Empty State Message -->
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <div class="empty-icon">📚</div>
+      <h3 id="empty-title">No assignments found</h3>
+      <p id="empty-desc">Try clearing your filters or create a new assignment.</p>
+      <button id="empty-action-btn" class="btn btn-primary" style="margin-top: 1rem;">
+        Add New Assignment
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Add / Edit Modal -->
+  <div id="assignment-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="modal-title">Add New Assignment</h2>
+        <button id="close-modal-btn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="assignment-form" class="modal-body" novalidate>
+        <input type="hidden" id="edit-id" value="" />
+
+        <!-- Title -->
+        <div class="form-group">
+          <label for="form-title">Assignment Title <span class="required">*</span></label>
+          <input type="text" id="form-title" placeholder="e.g. Binary Search Tree Lab Report" required />
+          <p class="form-error-msg">Please enter an assignment title (at least 3 characters).</p>
+        </div>
+
+        <!-- Subject with Auto-Suggest Datalist -->
+        <div class="form-group">
+          <label for="form-subject">Subject / Course <span class="required">*</span></label>
+          <input type="text" id="form-subject" list="subject-datalist" placeholder="e.g. Data Structures & Algorithms" required />
+          <datalist id="subject-datalist">
+            <option value="Data Structures & Algorithms"></option>
+            <option value="Database Management Systems"></option>
+            <option value="Operating Systems"></option>
+            <option value="Computer Networks"></option>
+            <option value="Software Engineering"></option>
+            <option value="Discrete Mathematics"></option>
+          </datalist>
+          <p class="form-error-msg">Please specify the subject or course name.</p>
+        </div>
+
+        <!-- Due Date & Time with Quick Date Chips -->
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="form-date">Due Date <span class="required">*</span></label>
+            <input type="date" id="form-date" required />
+            <div class="quick-date-chips">
+              <button type="button" class="date-chip" data-days="0">Today</button>
+              <button type="button" class="date-chip" data-days="1">Tomorrow</button>
+              <button type="button" class="date-chip" data-days="3">+3 Days</button>
+              <button type="button" class="date-chip" data-days="7">Next Week</button>
+            </div>
+            <p class="form-error-msg">Please select a valid deadline date.</p>
+          </div>
+
+          <div class="form-group half">
+            <label for="form-time">Due Time (Optional)</label>
+            <input type="time" id="form-time" value="23:59" />
+          </div>
+        </div>
+
+        <!-- Priority Radio Selector -->
+        <div class="form-group">
+          <label>Priority Level <span class="required">*</span></label>
+          <div class="priority-radio-group">
+            <label class="priority-radio priority-high">
+              <input type="radio" name="form-priority" value="High" />
+              <span>🔴 High</span>
+            </label>
+            <label class="priority-radio priority-med">
+              <input type="radio" name="form-priority" value="Medium" checked />
+              <span>🟠 Medium</span>
+            </label>
+            <label class="priority-radio priority-low">
+              <input type="radio" name="form-priority" value="Low" />
+              <span>🟢 Low</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Source Origin & Submission Mode -->
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="form-source">Source Channel</label>
+            <select id="form-source">
+              <option value="WhatsApp">WhatsApp Group</option>
+              <option value="Google Classroom">Google Classroom</option>
+              <option value="Moodle / LMS">Moodle / LMS</option>
+              <option value="Classroom Announcement">Classroom Announcement</option>
+              <option value="Notebook / Lecture">Notebook / Lecture</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group half">
+            <label for="form-mode">Submission Mode</label>
+            <select id="form-mode">
+              <option value="Online Portal">Online Portal</option>
+              <option value="Hard Copy">Hard Copy (Print/Handwritten)</option>
+              <option value="Email / Drive">Email / Google Drive</option>
+              <option value="Lab / Presentation">Lab / Presentation</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Notes / Instructions -->
+        <div class="form-group">
+          <label for="form-notes">Notes / Instructions / Links (Optional)</label>
+          <textarea id="form-notes" rows="2" placeholder="e.g. Include screenshots in PDF. Format code using PEP 8."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="save-btn" class="btn btn-primary">Save Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-sm text-center">
+      <div class="delete-icon">🗑️</div>
+      <h3>Delete Assignment?</h3>
+      <p id="delete-message" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+        Are you sure you want to delete this assignment?
+      </p>
+      <div class="modal-footer justify-center" style="margin-top: 1.25rem;">
+        <button id="cancel-delete-btn" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-delete-btn" class="btn btn-danger">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- College Project Viva & Review Guide Modal -->
+  <div id="guide-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-lg">
+      <div class="modal-header">
+        <div>
+          <h2>🎓 College Project Review & Viva Guide</h2>
+          <p style="font-size: 0.775rem; color: var(--text-muted);">Academic Presentation Sheet • Student Deadline Companion</p>
+        </div>
+        <button id="close-guide-btn" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <nav class="guide-tabs">
+          <button class="guide-tab-btn active" data-tab="tab-viva-design">1. Design Thinking</button>
+          <button class="guide-tab-btn" data-tab="tab-viva-problem">2. Problem & Objectives</button>
+          <button class="guide-tab-btn" data-tab="tab-viva-tech">3. Architecture & Tech</button>
+          <button class="guide-tab-btn" data-tab="tab-viva-script">4. 2-Min Demo Script</button>
+        </nav>
+
+        <!-- Tab 1: Design Thinking -->
+        <div id="tab-viva-design" class="guide-content-section active">
+          <div class="dt-card">
+            <h4>1️⃣ Empathize</h4>
+            <p><strong>Observation:</strong> College students juggle 5-7 parallel theory and laboratory courses. Deadline announcements are scattered across unorganized WhatsApp groups, multiple Google Classroom feeds, teacher emails, Moodle LMS forums, and handwritten lecture notes.</p>
+            <p style="margin-top: 0.25rem;"><strong>Pain Points:</strong> Cognitive overload, last-minute panic, missed submissions due to buried WhatsApp group messages, inability to tell which assignment is due today vs next week.</p>
+          </div>
+
+          <div class="dt-card">
+            <h4>2️⃣ Define</h4>
+            <p><strong>Problem Statement:</strong> <em>"Undergraduate students need a centralized, lightweight, zero-login deadline companion to organize coursework across fragmented communication channels, enabling instant priority assessment and proactive deadline management."</em></p>
+          </div>
+
+          <div class="dt-card">
+            <h4>3️⃣ Ideate</h4>
+            <p>Brainstormed solutions and filtered down to high-impact requirements:</p>
+            <ul>
+              <li>Instant visual triage (Overdue alerts, Due Today counter, Next 7 Days lookahead).</li>
+              <li>Source-tagging (WhatsApp, Classroom, Notebook) so students recall where instructions live.</li>
+              <li>Zero friction client-side persistence with browser localStorage (no server latency or signup barriers).</li>
+              <li>Multi-level filtering by Subject, Priority (High/Medium/Low), and keyword search.</li>
+            </ul>
+          </div>
+
+          <div class="dt-card">
+            <h4>4️⃣ Prototype</h4>
+            <p>Implemented a responsive single-page architecture using clean HTML5 semantic structure, modern CSS (Custom Properties, Flexbox, Grid), and modular vanilla JavaScript (ES6+), offering real-time form validation, progress visualization, and quick date chips.</p>
+          </div>
+
+          <div class="dt-card">
+            <h4>5️⃣ Validate</h4>
+            <p>Tested with realistic university coursework scenarios across mobile and desktop viewport sizes. Verified that students can record a deadline in under 10 seconds and instantly identify urgent deliverables.</p>
+          </div>
+        </div>
+
+        <!-- Tab 2: Problem & Objectives -->
+        <div id="tab-viva-problem" class="guide-content-section">
+          <div class="dt-card">
+            <h4>Problem Background</h4>
+            <p>In modern higher education, academic communication is split across disparate platforms:</p>
+            <ul>
+              <li>Informal announcements in student WhatsApp groups get buried under hundreds of chat messages.</li>
+              <li>LMS portals (Moodle, Blackboard) often require multiple clicks and VPNs to check deadlines.</li>
+              <li>Verbal reminders in classroom lectures are written on loose sheets of paper and easily forgotten.</li>
+            </ul>
+          </div>
+
+          <div class="dt-card">
+            <h4>Project Objectives</h4>
+            <ul>
+              <li><strong>Centralization:</strong> Provide a single dashboard where assignments from all platforms coexist.</li>
+              <li><strong>Prioritization:</strong> Highlight urgent items through High/Medium/Low color badges and dynamic time remaining.</li>
+              <li><strong>Accessibility:</strong> Ensure instant loading on mobile devices without mandatory server accounts or logins.</li>
+              <li><strong>Reliability:</strong> Maintain persistent offline storage via browser localStorage API.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Tab 3: Tech Stack & Architecture -->
+        <div id="tab-viva-tech" class="guide-content-section">
+          <div class="dt-card">
+            <h4>Technology Stack</h4>
+            <ul>
+              <li><strong>HTML5:</strong> Semantic elements (<code>&lt;header&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;datalist&gt;</code>) for accessibility and clean DOM structure.</li>
+              <li><strong>CSS3:</strong> CSS Custom Properties (Variables), CSS Grid for stats and forms, Flexbox for responsive navigation, and mobile media queries.</li>
+              <li><strong>Vanilla JavaScript (ES6+):</strong> Pure DOM manipulation, modular event handling, array filtering/sorting algorithms, and input validation without heavy framework dependencies.</li>
+              <li><strong>Storage:</strong> HTML5 Web Storage API (<code>localStorage</code>) with JSON serialization and backup export/import.</li>
+            </ul>
+          </div>
+
+          <div class="code-snippet">
+// Folder Structure for GitHub Upload:
+student-deadline-companion/
+├── index.html        # Semantic HTML5 Dashboard & Modals
+├── style.css         # Modern, responsive CSS with Custom Properties
+├── script.js         # Vanilla JavaScript CRUD, Filters & LocalStorage
+└── README.md         # Academic Project Documentation & Review Guide
+          </div>
+        </div>
+
+        <!-- Tab 4: 2-Minute Viva Presentation Script -->
+        <div id="tab-viva-script" class="guide-content-section">
+          <div class="dt-card">
+            <h4>Recommended 2-Minute Reviewer Presentation Flow</h4>
+            <ol style="padding-left: 1.25rem; font-size: 0.8rem; color: #475569; line-height: 1.6;">
+              <li><strong>Introduction (30s):</strong> "Good morning professors. I have developed 'Student Deadline Companion' to solve the widespread student issue of missed deadlines caused by scattered announcements across WhatsApp, Google Classroom, and LMS portals."</li>
+              <li><strong>Dashboard & Metrics (30s):</strong> Point to the 5 top summary cards (Total, Today, This Week, Overdue, Completed) and the completion progress bar. Demonstrate clicking the "Due Today" or "This Week" card to filter instantly.</li>
+              <li><strong>Adding with Validation (30s):</strong> Click <em>+ Add Assignment</em>, demonstrate the "Tomorrow" or "+3 Days" shortcut chip, select "WhatsApp" as source, and save with live validation.</li>
+              <li><strong>Filtering & Persistence (30s):</strong> Demonstrate search, filter by High Priority, and mark an assignment completed. Refresh the browser to prove zero data loss via localStorage.</li>
+            </ol>
+          </div>
+
+          <div style="text-align: center; margin-top: 1rem;">
+            <button id="guide-load-demo-btn" class="btn btn-primary">
+              Load Sample College Coursework
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="guide-close-bottom-btn" class="btn btn-secondary">Close Guide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div>
+        <strong>Student Deadline Companion</strong> • Built with pure HTML5, CSS3, and Vanilla JavaScript.
+      </div>
+      <div class="footer-links">
+        <span class="footer-link" onclick="document.getElementById('open-guide-btn').click();">Design Thinking Process</span>
+        <span>•</span>
+        <span class="footer-link" onclick="document.getElementById('load-demo-btn').click();">Reset Demo Data</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Alert -->
+  <div id="toast" class="toast" style="display: none;" role="status"></div>
+
+  <!-- Vanilla JavaScript Application Logic -->
+  <script src="script.js"></script>
+</body>
+</html>

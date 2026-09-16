@@ -1,0 +1,6 @@
+{
+  "name": "Student Deadline Companion",
+  "description": "A clean, mobile-friendly college assignment and deadline tracker to organize coursework from WhatsApp, classroom announcements, and LMS platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
